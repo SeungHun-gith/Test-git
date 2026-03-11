@@ -564,6 +564,7 @@
 
     function initPetals() {
       const wrap = document.getElementById('petalsWrap');
+      if (!wrap) return;
       const count = 28;
       for (let i = 0; i < count; i++) {
         const p = document.createElement('div');
@@ -627,14 +628,14 @@
       const bonusBallEl = document.getElementById('bonusBall');
       const statusEl = document.getElementById('gameStatus');
       const btn = document.getElementById('recommendBtn');
+      if (!row) return;
+
       const empty = document.getElementById('emptyState');
       if (empty) empty.remove();
 
-      bonusWrap.style.display = 'none';
-      statusEl.textContent = '뽑는 중...';
-      statusEl.classList.add('draw');
-      btn.disabled = true;
-      btn.textContent = '뽑는 중...';
+      if (bonusWrap) bonusWrap.style.display = 'none';
+      if (statusEl) { statusEl.textContent = '뽑는 중...'; statusEl.classList.add('draw'); }
+      if (btn) { btn.disabled = true; btn.textContent = '뽑는 중...'; }
 
       row.innerHTML = Array(6).fill(0).map(() => '<span class="ball slot">?</span>').join('');
 
@@ -642,8 +643,9 @@
         setTimeout(() => {
           const colorClass = getBallColor(num);
           const ball = row.children[i];
+          if (!ball) return;
           ball.textContent = num;
-          ball.className = `ball ${colorClass} show`;
+          ball.className = 'ball ' + colorClass + ' show';
           ball.style.animation = 'none';
           ball.offsetHeight;
           ball.style.animation = 'ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
@@ -651,24 +653,25 @@
       });
 
       setTimeout(() => {
-        statusEl.textContent = '보너스 번호!';
-        statusEl.classList.remove('draw');
-        bonusWrap.style.display = 'flex';
-        bonusBallEl.textContent = bonus;
-        bonusBallEl.className = `ball ${getBallColor(bonus)} bonus show`;
-        bonusBallEl.style.animation = 'ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        if (statusEl) { statusEl.textContent = '보너스 번호!'; statusEl.classList.remove('draw'); }
+        if (bonusWrap) bonusWrap.style.display = 'flex';
+        if (bonusBallEl) {
+          bonusBallEl.textContent = bonus;
+          bonusBallEl.className = 'ball ' + getBallColor(bonus) + ' bonus show';
+          bonusBallEl.style.animation = 'ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        }
       }, 6 * REVEAL_DELAY + BONUS_DELAY);
 
       setTimeout(() => {
-        statusEl.textContent = '오늘의 번호가 나왔어요! ✨';
-        btn.disabled = false;
-        btn.textContent = '🎲 한 판 더 뽑기';
+        if (statusEl) statusEl.textContent = '오늘의 번호가 나왔어요! ✨';
+        if (btn) { btn.disabled = false; btn.textContent = '🎲 한 판 더 뽑기'; }
         showConfetti();
       }, 6 * REVEAL_DELAY + BONUS_DELAY + 800);
     }
 
     function renderHistory() {
       const list = document.getElementById('historyList');
+      if (!list) return;
       const history = JSON.parse(localStorage.getItem('lottoHistory') || '[]');
 
       if (history.length === 0) {
@@ -710,17 +713,44 @@
       history = history.slice(0, MAX_HISTORY);
       localStorage.setItem('lottoHistory', JSON.stringify(history));
       renderHistory();
+    }
+
+    function onRecommendClick() {
+      const { main, bonus } = generateLottoNumbers();
+      saveToHistory(main, bonus);
+      try {
+        playDraw(main, bonus);
+      } catch (e) {
+        console.error('playDraw 오류:', e);
+        showNumbersFallback(main, bonus);
+      }
       saveToSupabase(main, bonus);
     }
 
-    document.getElementById('recommendBtn').addEventListener('click', () => {
-      const { main, bonus } = generateLottoNumbers();
-      saveToHistory(main, bonus);
-      playDraw(main, bonus);
-    });
+    function showNumbersFallback(main, bonus) {
+      const row = document.getElementById('ballsRow');
+      const bonusWrap = document.getElementById('bonusWrap');
+      const statusEl = document.getElementById('gameStatus');
+      const btn = document.getElementById('recommendBtn');
+      if (!row) return;
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+      row.innerHTML = main.map(num => `<span class="ball ${getBallColor(num)} show">${num}</span>`).join('');
+      if (statusEl) statusEl.textContent = '오늘의 번호가 나왔어요! ✨';
+      if (bonusWrap) {
+        bonusWrap.style.display = 'flex';
+        const bonusBallEl = document.getElementById('bonusBall');
+        if (bonusBallEl) {
+          bonusBallEl.textContent = bonus;
+          bonusBallEl.className = 'ball ' + getBallColor(bonus) + ' bonus show';
+        }
+      }
+      if (btn) { btn.disabled = false; btn.textContent = '🎲 한 판 더 뽑기'; }
+    }
 
     function renderPastWins() {
       const list = document.getElementById('pastWinsList');
+      if (!list) return;
       list.innerHTML = PAST_2025_WINS.map(d => {
         const mainBalls = d.main.map(n => `<span class="mini-ball ${getBallColor(n)}">${n}</span>`).join('');
         const bonusBall = `<span class="mini-ball ${getBallColor(d.bonus)} bonus">${d.bonus}</span>`;
@@ -733,9 +763,19 @@
       }).join('');
     }
 
-    initPetals();
-    renderHistory();
-    renderPastWins();
+    function init() {
+      const btn = document.getElementById('recommendBtn');
+      if (btn) btn.addEventListener('click', onRecommendClick);
+      initPetals();
+      renderHistory();
+      renderPastWins();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
