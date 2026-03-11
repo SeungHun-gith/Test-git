@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>에스파 카리나가 추천해요 · 로또 번호</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --iu-lavender: #c4b5fd;
+      --iu-pink: #f9a8d4;
+      --iu-peach: #fcd34d;
+      --iu-cream: #fef3c7;
+      --iu-bg: #faf5ff;
+      --iu-bg-card: #ffffff;
+      --iu-text: #4c1d95;
+      --iu-text-soft: #6d28d9;
+      --iu-text-muted: #8b5cf6;
+      --iu-border: rgba(196, 181, 253, 0.5);
+      --ball-1: #fde68a;
+      --ball-2: #a7f3d0;
+      --ball-3: #bae6fd;
+      --ball-4: #fbcfe8;
+      --ball-5: #ddd6fe;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--iu-bg);
+      color: var(--iu-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/1/12/230601_Karina_%28aespa%29.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      background:
+        linear-gradient(180deg, rgba(250, 245, 255, 0.92) 0%, rgba(250, 245, 255, 0.88) 50%, rgba(250, 245, 255, 0.94) 100%),
+        radial-gradient(ellipse 100% 80% at 50% 0%, rgba(196, 181, 253, 0.35) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 100% 80%, rgba(249, 168, 212, 0.25) 0%, transparent 50%);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem 2.5rem;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--iu-text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+      color: var(--iu-text);
+    }
+
+    .hero h1 .name {
+      color: var(--iu-text-soft);
+      font-weight: 700;
+    }
+
+    .hero .subtitle {
+      font-size: 0.95rem;
+      color: var(--iu-text-muted);
+      font-weight: 400;
+    }
+
+    .hero-photo-wrap {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 1.25rem;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .hero-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.25), 0 0 0 1px var(--iu-border);
+      display: block;
+    }
+
+    .hero-photo-wrap .photo-fallback {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--iu-lavender) 0%, var(--iu-pink) 100%);
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--iu-text);
+      letter-spacing: -0.02em;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.25), 0 0 0 1px var(--iu-border);
+    }
+
+    .hero-photo-wrap .photo-fallback.show {
+      display: flex;
+    }
+
+    .hero-photo-wrap img.hide {
+      display: none;
+    }
+
+    .card {
+      background: var(--iu-bg-card);
+      border-radius: 24px;
+      padding: 2rem 2rem 2.25rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.08), 0 2px 8px rgba(196, 181, 253, 0.15);
+      border: 1px solid var(--iu-border);
+    }
+
+    .balls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      min-height: 52px;
+    }
+
+    .bonus-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .bonus-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--iu-text-muted);
+    }
+
+    .ball.bonus {
+      border: 2px solid var(--iu-text-soft);
+      box-shadow: 0 0 0 2px var(--iu-cream);
+    }
+
+    .ball {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--iu-text);
+      box-shadow: 0 2px 12px rgba(124, 58, 237, 0.12);
+      transition: transform 0.2s ease;
+    }
+
+    .ball.slot {
+      background: var(--iu-cream);
+      color: var(--iu-text-muted);
+      font-size: 0.9rem;
+      animation: slotPulse 0.6s ease-in-out infinite;
+    }
+
+    @keyframes slotPulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .ball.show {
+      animation: ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes ballPop {
+      0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+      60% { transform: scale(1.2) rotate(10deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .ball.bounce {
+      animation: ballBounce 0.4s ease;
+    }
+
+    @keyframes ballBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .ball-1 { background: var(--ball-1); }
+    .ball-2 { background: var(--ball-2); }
+    .ball-3 { background: var(--ball-3); }
+    .ball-4 { background: var(--ball-4); }
+    .ball-5 { background: var(--ball-5); }
+
+    .btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--iu-lavender) 0%, var(--iu-pink) 100%);
+      color: var(--iu-text);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 14px rgba(196, 181, 253, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(196, 181, 253, 0.45);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .history {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--iu-border);
+    }
+
+    .history h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--iu-text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .history-item .mini-ball {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--iu-text);
+    }
+
+    .history-item .mini-ball.bonus {
+      border: 2px solid var(--iu-text-soft);
+    }
+
+    .empty-state {
+      color: var(--iu-text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .game-status {
+      font-size: 0.9rem;
+      color: var(--iu-text-muted);
+      text-align: center;
+      min-height: 1.4em;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-status.draw {
+      animation: statusBlink 0.5s ease infinite;
+    }
+
+    @keyframes statusBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .confetti-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFall 2s ease-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .petals-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .petal {
+      position: absolute;
+      border-radius: 50%;
+      animation: petalFall linear infinite;
+      opacity: 0.75;
+    }
+
+    @keyframes petalFall {
+      0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        opacity: 0.6;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(110vh) translateX(30px) rotate(360deg);
+        opacity: 0.5;
+      }
+    }
+
+    .past-wins {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 2rem;
+      padding: 1.5rem 1.75rem;
+      background: var(--iu-bg-card);
+      border-radius: 24px;
+      border: 1px solid var(--iu-border);
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.08), 0 2px 8px rgba(196, 181, 253, 0.15);
+    }
+
+    .past-wins h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--iu-text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .past-wins .draw-item {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.5rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(196, 181, 253, 0.25);
+    }
+
+    .past-wins .draw-item:last-child {
+      border-bottom: none;
+    }
+
+    .past-wins .draw-meta {
+      width: 100%;
+      font-size: 0.8rem;
+      color: var(--iu-text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .past-wins .draw-balls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .past-wins .draw-balls .mini-ball {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--iu-text);
+    }
+
+    .past-wins .draw-balls .mini-ball.bonus {
+      border: 2px solid var(--iu-text-soft);
+    }
+
+    .past-wins .source {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--iu-text-muted);
+    }
+
+    .past-wins .source a {
+      color: var(--iu-text-soft);
+      text-decoration: none;
+    }
+
+    .past-wins .source a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="petals-wrap" id="petalsWrap" aria-hidden="true"></div>
+  <main>
+    <div class="hero">
+      <div class="hero-photo-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/230601_Karina_%28aespa%29.jpg" alt="에스파 카리나" id="heroPhoto" onerror="this.classList.add('hide'); this.nextElementSibling.classList.add('show');">
+        <div class="photo-fallback" id="photoFallback">K</div>
+      </div>
+      <p class="badge">aespa · LUCKY NUMBERS</p>
+      <h1><span class="name">카리나</span>가 추천해요</h1>
+      <p class="subtitle">재미로 뽑는 행운 번호 게임 ✨</p>
+    </div>
+
+    <div class="card">
+      <p class="game-status" id="gameStatus"></p>
+      <div class="balls-row" id="ballsRow">
+        <span class="empty-state" id="emptyState">아래 버튼으로 번호를 뽑아보세요!</span>
+      </div>
+      <div class="bonus-wrap" id="bonusWrap" style="display: none;">
+        <span class="bonus-label">보너스</span>
+        <span class="ball" id="bonusBall"></span>
+      </div>
+      <button type="button" class="btn" id="recommendBtn">🎲 한 판 뽑기</button>
+
+      <div class="history">
+        <h2>방금 뽑은 번호</h2>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <section class="past-wins" aria-label="로또 1등 당첨번호">
+      <h2>🏆 2025년 로또 1등 당첨번호</h2>
+      <div id="pastWinsList"></div>
+      <p class="source">2025년 전체 회차·최신 당첨번호는 <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>에서 확인할 수 있어요.</p>
+    </section>
+  </main>
+
+  <script>
+    const BALL_COLORS = ['ball-1', 'ball-2', 'ball-3', 'ball-4', 'ball-5'];
+    const MAX_HISTORY = 5;
+    const PETAL_COLORS = ['#c4b5fd', '#f9a8d4', '#fcd34d', '#a7f3d0', '#bae6fd', '#ddd6fe', '#fbcfe8', '#fde68a'];
+
+    // 2025년~최신 로또 1등 당첨번호 (웹 검색 기준)
+    const PAST_2025_WINS = [
+      { round: 1214, date: '2026.03.07', main: [10, 15, 19, 27, 30, 33], bonus: 14, winners: 12 },
+    ];
+    const REVEAL_DELAY = 420;
+    const BONUS_DELAY = 600;
+
+    function initPetals() {
+      const wrap = document.getElementById('petalsWrap');
+      const count = 28;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        const size = 6 + Math.random() * 10;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.background = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)];
+        p.style.animationDuration = (10 + Math.random() * 14) + 's';
+        p.style.animationDelay = -(Math.random() * 20) + 's';
+        wrap.appendChild(p);
+      }
+    }
+
+    function getBallColor(num) {
+      if (num <= 10) return BALL_COLORS[0];
+      if (num <= 20) return BALL_COLORS[1];
+      if (num <= 30) return BALL_COLORS[2];
+      if (num <= 40) return BALL_COLORS[3];
+      return BALL_COLORS[4];
+    }
+
+    function generateLottoNumbers() {
+      const set = new Set();
+      while (set.size < 6) {
+        set.add(Math.floor(Math.random() * 45) + 1);
+      }
+      const main = Array.from(set).sort((a, b) => a - b);
+      const bonus = generateBonus(main);
+      return { main, bonus };
+    }
+
+    function generateBonus(main) {
+      let n;
+      do {
+        n = Math.floor(Math.random() * 45) + 1;
+      } while (main.includes(n));
+      return n;
+    }
+
+    function showConfetti() {
+      const wrap = document.createElement('div');
+      wrap.className = 'confetti-wrap';
+      const colors = ['#c4b5fd', '#f9a8d4', '#fcd34d', '#a7f3d0', '#bae6fd', '#ddd6fe'];
+      for (let i = 0; i < 24; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.animationDelay = Math.random() * 0.5 + 's';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        wrap.appendChild(c);
+      }
+      document.body.appendChild(wrap);
+      setTimeout(() => wrap.remove(), 2500);
+    }
+
+    function playDraw(main, bonus) {
+      const row = document.getElementById('ballsRow');
+      const bonusWrap = document.getElementById('bonusWrap');
+      const bonusBallEl = document.getElementById('bonusBall');
+      const statusEl = document.getElementById('gameStatus');
+      const btn = document.getElementById('recommendBtn');
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+
+      bonusWrap.style.display = 'none';
+      statusEl.textContent = '뽑는 중...';
+      statusEl.classList.add('draw');
+      btn.disabled = true;
+      btn.textContent = '뽑는 중...';
+
+      row.innerHTML = Array(6).fill(0).map(() => '<span class="ball slot">?</span>').join('');
+
+      main.forEach((num, i) => {
+        setTimeout(() => {
+          const colorClass = getBallColor(num);
+          const ball = row.children[i];
+          ball.textContent = num;
+          ball.className = `ball ${colorClass} show`;
+          ball.style.animation = 'none';
+          ball.offsetHeight;
+          ball.style.animation = 'ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        }, (i + 1) * REVEAL_DELAY);
+      });
+
+      setTimeout(() => {
+        statusEl.textContent = '보너스 번호!';
+        statusEl.classList.remove('draw');
+        bonusWrap.style.display = 'flex';
+        bonusBallEl.textContent = bonus;
+        bonusBallEl.className = `ball ${getBallColor(bonus)} bonus show`;
+        bonusBallEl.style.animation = 'ballPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+      }, 6 * REVEAL_DELAY + BONUS_DELAY);
+
+      setTimeout(() => {
+        statusEl.textContent = '오늘의 번호가 나왔어요! ✨';
+        btn.disabled = false;
+        btn.textContent = '🎲 한 판 더 뽑기';
+        showConfetti();
+      }, 6 * REVEAL_DELAY + BONUS_DELAY + 800);
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      const history = JSON.parse(localStorage.getItem('lottoHistory') || '[]');
+
+      if (history.length === 0) {
+        list.innerHTML = '<p class="empty-state">뽑은 번호가 여기 모여요</p>';
+        return;
+      }
+
+      list.innerHTML = history.map(nums => {
+        const isNewFormat = nums.length === 7;
+        const main = isNewFormat ? nums.slice(0, 6) : nums;
+        const bonus = isNewFormat ? nums[6] : null;
+        return `
+        <div class="history-item">
+          ${main.map(n => `<span class="mini-ball ${getBallColor(n)}">${n}</span>`).join('')}
+          ${bonus != null ? `<span class="mini-ball ${getBallColor(bonus)} bonus">${bonus}</span>` : ''}
+        </div>
+      `}).join('');
+    }
+
+    function saveToHistory(main, bonus) {
+      let history = JSON.parse(localStorage.getItem('lottoHistory') || '[]');
+      history.unshift([...main, bonus]);
+      history = history.slice(0, MAX_HISTORY);
+      localStorage.setItem('lottoHistory', JSON.stringify(history));
+      renderHistory();
+    }
+
+    document.getElementById('recommendBtn').addEventListener('click', () => {
+      const { main, bonus } = generateLottoNumbers();
+      saveToHistory(main, bonus);
+      playDraw(main, bonus);
+    });
+
+    function renderPastWins() {
+      const list = document.getElementById('pastWinsList');
+      list.innerHTML = PAST_2025_WINS.map(d => {
+        const mainBalls = d.main.map(n => `<span class="mini-ball ${getBallColor(n)}">${n}</span>`).join('');
+        const bonusBall = `<span class="mini-ball ${getBallColor(d.bonus)} bonus">${d.bonus}</span>`;
+        return `
+          <div class="draw-item">
+            <div class="draw-meta">${d.round}회 (${d.date}) · 1등 ${d.winners}명</div>
+            <div class="draw-balls">${mainBalls} ${bonusBall}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    initPetals();
+    renderHistory();
+    renderPastWins();
+  </script>
+</body>
+</html>
