@@ -521,10 +521,39 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
     const BALL_COLORS = ['ball-1', 'ball-2', 'ball-3', 'ball-4', 'ball-5'];
     const MAX_HISTORY = 5;
     const PETAL_COLORS = ['#c4b5fd', '#f9a8d4', '#fcd34d', '#a7f3d0', '#bae6fd', '#ddd6fe', '#fbcfe8', '#fde68a'];
+
+    // Supabase는 /api/config 에서 Vercel 환경 변수로 초기화 (배포 시)
+    let supabase = null;
+    async function initSupabase() {
+      try {
+        const base = window.location.origin;
+        const res = await fetch(base + '/api/config');
+        if (!res.ok) {
+          console.warn('[Supabase] /api/config 응답 오류:', res.status);
+          return;
+        }
+        const data = await res.json();
+        if (!data.SUPABASE_URL || !data.SUPABASE_ANON_KEY) {
+          console.warn('[Supabase] Vercel에 SUPABASE_URL, SUPABASE_ANON_KEY 환경 변수를 설정해 주세요.');
+          return;
+        }
+        const lib = window.supabase;
+        const createClient = lib?.createClient || lib?.default?.createClient;
+        if (typeof createClient === 'function') {
+          supabase = createClient(data.SUPABASE_URL, data.SUPABASE_ANON_KEY);
+        } else {
+          console.warn('[Supabase] createClient를 찾을 수 없습니다. CDN 스크립트를 확인하세요.');
+        }
+      } catch (e) {
+        console.warn('[Supabase] config 로드 실패 (로컬에서 API 없을 때는 정상):', e.message);
+      }
+    }
+    const supabaseReady = initSupabase();
 
     // 2025년~최신 로또 1등 당첨번호 (웹 검색 기준)
     const PAST_2025_WINS = [
@@ -659,12 +688,29 @@
       `}).join('');
     }
 
+    async function saveToSupabase(main, bonus) {
+      try {
+        await supabaseReady;
+        if (!supabase) return;
+        const { error } = await supabase.from('lotto_recommendations').insert({
+          main_numbers: main,
+          bonus_number: bonus
+        });
+        if (error) {
+          console.error('[Supabase] 저장 실패:', error.message, error);
+        }
+      } catch (e) {
+        console.error('[Supabase] 저장 오류:', e);
+      }
+    }
+
     function saveToHistory(main, bonus) {
       let history = JSON.parse(localStorage.getItem('lottoHistory') || '[]');
       history.unshift([...main, bonus]);
       history = history.slice(0, MAX_HISTORY);
       localStorage.setItem('lottoHistory', JSON.stringify(history));
       renderHistory();
+      saveToSupabase(main, bonus);
     }
 
     document.getElementById('recommendBtn').addEventListener('click', () => {
