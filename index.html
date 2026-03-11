@@ -527,8 +527,8 @@
     const MAX_HISTORY = 5;
     const PETAL_COLORS = ['#c4b5fd', '#f9a8d4', '#fcd34d', '#a7f3d0', '#bae6fd', '#ddd6fe', '#fbcfe8', '#fde68a'];
 
-    // Supabase는 /api/config 에서 Vercel 환경 변수로 초기화 (배포 시)
-    let supabase = null;
+    // Supabase는 /api/config 에서 Vercel 환경 변수로 초기화 (배포 시) - CDN 전역 'supabase'와 충돌 방지로 supabaseClient 사용
+    let supabaseClient = null;
     async function initSupabase() {
       try {
         const base = window.location.origin;
@@ -545,7 +545,7 @@
         const lib = window.supabase;
         const createClient = lib?.createClient || lib?.default?.createClient;
         if (typeof createClient === 'function') {
-          supabase = createClient(data.SUPABASE_URL, data.SUPABASE_ANON_KEY);
+          supabaseClient = createClient(data.SUPABASE_URL, data.SUPABASE_ANON_KEY);
         } else {
           console.warn('[Supabase] createClient를 찾을 수 없습니다. CDN 스크립트를 확인하세요.');
         }
@@ -694,8 +694,8 @@
     async function saveToSupabase(main, bonus) {
       try {
         await supabaseReady;
-        if (!supabase) return;
-        const { error } = await supabase.from('lotto_recommendations').insert({
+        if (!supabaseClient) return;
+        const { error } = await supabaseClient.from('lotto_recommendations').insert({
           main_numbers: main,
           bonus_number: bonus
         });
